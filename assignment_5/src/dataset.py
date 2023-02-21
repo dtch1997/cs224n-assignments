@@ -1,4 +1,5 @@
 import random
+import numpy as np
 import torch
 from torch.utils.data import Dataset
 import argparse
@@ -167,8 +168,33 @@ class CharCorruptionDataset(Dataset):
         return len(self.data)
 
     def __getitem__(self, idx):
-        # TODO [part e]: see spec above
-        raise NotImplementedError
+        doc = self.data[idx]
+        
+        # Randomly truncate document
+        doc_max_len = random.randint(4, int(self.block_size * 7 / 8) + 1)
+        if doc_max_len > len(doc): 
+            doc_max_len = len(doc)
+        doc = doc[:doc_max_len]
+
+        # Randomly split into [prefix, masked_content, suffix]
+        masked_content_len = np.random.binomial(doc_max_len, p = 0.25)
+        unmasked_content_len = doc_max_len - masked_content_len
+        prefix_len = random.randint(0, unmasked_content_len + 1)
+        prefix = doc[:prefix_len]
+        masked_content = doc[prefix_len: prefix_len + masked_content_len]
+        suffix = doc[prefix_len + masked_content_len:]
+
+        # Rearrange these substrings into the following form:
+        # [prefix] MASK_CHAR [suffix] MASK_CHAR [masked_content] [pads]
+        text = prefix + self.MASK_CHAR + suffix + self.MASK_CHAR + masked_content
+        pad_len = self.block_size - len(text)
+        masked_str = text + self.PAD_CHAR * pad_len
+        x, y = masked_str[:-1], masked_str[1:]
+
+        # Encode as torch.long and return
+        x = torch.tensor([self.stoi[c] for c in x], dtype=torch.long)
+        y = torch.tensor([self.stoi[c] for c in y], dtype=torch.long)
+        return x, y
 
 """
 Code under here is strictly for your debugging purposes; feel free to modify
