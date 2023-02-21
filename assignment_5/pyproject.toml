@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "assignment-5"
+version = "0.1.0"
+description = ""
+authors = ["Daniel Tan <dtch1997@users.noreply.github.com>"]
+readme = "README.md"
+packages = [{include = "assignment_5"}]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+torch = "^1.13.1"
+numpy = "^1.24.2"
+tqdm = "^4.64.1"
+
+
+[tool.poetry.group.dev.dependencies]
+jupyter = "^1.0.0"
+notebook = "^6.5.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
