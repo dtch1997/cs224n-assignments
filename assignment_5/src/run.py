@@ -135,7 +135,7 @@ elif args.function == 'finetune':
         name_dataset = dataset.NameDataset(pretrain_dataset, data) 
     tconf = trainer.TrainerConfig(
         max_epochs=75, 
-        batch_size=64, 
+        batch_size=256, 
         learning_rate=args.finetune_lr,
         lr_decay=True, 
         warmup_tokens=512*20, 
